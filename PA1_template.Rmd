@@ -5,24 +5,60 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(dplyr)
+library(ggplot2)
 ```
 
-## R Markdown
+## Loading and preprocessing the data
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+If not present, create data folder:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r data folder }
+if(!file.exists("./data"))
+    {dir.create("./data")}
 ```
 
-## Including Plots
+If not present dowload zip data, if not already done unzip it:
 
-You can also embed plots, for example:
+```{r download zip}
+URLfile<-"https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+if(!file.exists("./data/repdata-data-activity.zip")){
+    download.file(URLfile, "./data/repdata-data-activity.zip", method = "curl")
+}
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+if(!file.exists("./data/activity.csv")){
+    unzip("./data/repdata-data-activity.zip", exdir = "./data")
+}
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Read data into R:
+
+```{r reading}
+activity <- read.csv("./data/activity.csv")
+
+```
+
+## What is mean total number of steps taken per day?
+
+Plotting histogram of total number of steps per day:
+
+```{r stepsperday, echo=FALSE}
+dates<-unique(activity$date)
+stepsperday<-vector()
+datesrep<-vector()
+
+for(current in dates){
+    c<-sum(activity[activity$date==current,]$steps)
+    
+    if(!is.null(c) & !is.na(c) & !is.nan(c)){
+        datesrep<- c(datesrep, rep(current,c))
+        stepsperday<- c(stepsperday,c)
+    }
+}
+mea <- as.character(mean(as.numeric(stepsperday)))
+med <- as.character(median(as.numeric(stepsperday)))
+qplot(datesrep) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Total average number of steps taken per day is `r mea`, the median is `r med`
