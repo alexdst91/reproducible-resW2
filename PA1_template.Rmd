@@ -166,5 +166,4 @@ activityfilled <- mutate(activityfilled, day.type = factor((weekdays(date) %in% 
 groPatternfil <- group_by(activityfilled, day.type, interval)
 groPatternfil <- summarise(groPatternfil, Ave.Step.Interval = mean(steps,na.rm = TRUE))
 qplot(interval, Ave.Step.Interval,data=groPatternfil , facets = . ~ day.type, xlab = "Interval of day",ylab = "Average number of steps") 
-
 ```
